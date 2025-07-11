@@ -1,9 +1,16 @@
 // Backend API connection for SCHS FBLA
-const API_BASE_URL = 'http://localhost:3001/api';
+// For local development: http://localhost:3001/api
+// For production: You'll need to deploy the backend to a cloud service
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3001/api' 
+    : 'https://your-backend-domain.com/api'; // Replace with your deployed backend URL
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
     const loginMessage = document.getElementById('loginMessage');
+
+    // Check if backend is accessible
+    checkBackendStatus();
 
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -48,11 +55,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Login error:', error);
-            showMessage('Network error. Please check your connection.', 'error');
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                showMessage('Backend server is not accessible. Please ensure the server is running locally or contact the administrator.', 'error');
+            } else {
+                showMessage('Network error. Please check your connection.', 'error');
+            }
         } finally {
             // Reset button state
             submitButton.disabled = false;
-            submitButton.textContent = 'Login';
+            submitButton.textContent = 'Sign In';
         }
     });
 
@@ -66,6 +77,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 loginMessage.textContent = '';
                 loginMessage.className = 'login-message';
             }, 5000);
+        }
+    }
+
+    // Check if backend is accessible
+    async function checkBackendStatus() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/health`);
+            if (response.ok) {
+                console.log('✅ Backend server is accessible');
+            }
+        } catch (error) {
+            console.warn('⚠️ Backend server is not accessible:', error);
+            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                showMessage('Note: Backend server is not deployed. Login will not work on GitHub Pages until the backend is deployed to a cloud service.', 'info');
+            }
         }
     }
 });

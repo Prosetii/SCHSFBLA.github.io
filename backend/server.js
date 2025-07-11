@@ -22,15 +22,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration - allow both GitHub Pages and localhost
+// CORS configuration
 app.use(cors({
-  origin: [
-    'https://prosetii.github.io',
-    'https://prosetii.github.io/SCHSFBLA.github.io',
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000'
-  ],
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 

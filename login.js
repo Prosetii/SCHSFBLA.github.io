@@ -1,5 +1,5 @@
 // Backend API connection for SCHS FBLA
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'https://myproject-1vypt4c7v-seth-durazos-projects.vercel.app/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showMessage('Logging in...', 'info');
         const submitButton = loginForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
-        submitButton.textContent = 'Logging in...';
+        submitButton.textContent = 'Signing in...';
         
         try {
             // Send login request to backend
@@ -48,11 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Login error:', error);
-            showMessage('Network error. Please check your connection.', 'error');
+            showMessage('Network error. Please check your connection or ensure the backend is deployed.', 'error');
         } finally {
             // Reset button state
             submitButton.disabled = false;
-            submitButton.textContent = 'Login';
+            submitButton.textContent = 'Sign In';
         }
     });
 

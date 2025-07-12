@@ -73,20 +73,42 @@
         padding: 20px;
         border-radius: 10px;
         font-size: 18px;
-        z-index: 10000;
+        z-index: 10001;
         animation: fadeInOut 3s ease-in-out;
+        text-align: center;
       `;
       message.textContent = '🎉 You found the easter egg! 🎉';
       document.body.appendChild(message);
+
+      // Show the image
+      const img = document.createElement('img');
+      img.src = 'Reign.png';
+      img.alt = 'Reign Energy Drink';
+      img.style.cssText = `
+        position: fixed;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: auto;
+        z-index: 10002;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        animation: fadeInOut 3s ease-in-out;
+        background: white;
+        padding: 8px;
+      `;
+      document.body.appendChild(img);
       
       // Remove the effect after 3 seconds
       setTimeout(() => {
         document.body.style.background = '';
         document.body.removeChild(message);
+        document.body.removeChild(img);
       }, 3000);
     }
     
-    // Add CSS animation for the message
+    // Add CSS animation for the message and image
     const style = document.createElement('style');
     style.textContent = `
       @keyframes fadeInOut {

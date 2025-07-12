@@ -48,5 +48,56 @@
     <p>© 2025 SCHS FBLA. Made with intention.</p>
   </footer>
 
+  <!-- Easter Egg Button -->
+  <button id="easterEgg" onclick="activateEasterEgg()" title="🎉"></button>
+
+  <script>
+    function activateEasterEgg() {
+      // Create a fun animation effect
+      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Add a temporary rainbow effect to the page
+      document.body.style.transition = 'background 0.5s ease';
+      document.body.style.background = `linear-gradient(45deg, ${randomColor}20, transparent)`;
+      
+      // Show a fun message
+      const message = document.createElement('div');
+      message.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 18px;
+        z-index: 10000;
+        animation: fadeInOut 3s ease-in-out;
+      `;
+      message.textContent = '🎉 You found the easter egg! 🎉';
+      document.body.appendChild(message);
+      
+      // Remove the effect after 3 seconds
+      setTimeout(() => {
+        document.body.style.background = '';
+        document.body.removeChild(message);
+      }, 3000);
+    }
+    
+    // Add CSS animation for the message
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+
 </body>
 </html>

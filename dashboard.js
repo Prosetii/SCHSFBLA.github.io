@@ -2,13 +2,20 @@
 const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
 
 document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Dashboard loaded, checking authentication...');
+    
     // Check if user is logged in
     const isLoggedIn = await checkLoginStatus();
+    console.log('Login status result:', isLoggedIn);
+    
     if (!isLoggedIn) {
+        console.log('User not logged in, redirecting to login page');
         // Redirect to login if not logged in
         window.location.href = 'login.html';
         return;
     }
+    
+    console.log('User is logged in, loading dashboard...');
 
     // Display user greeting
     const currentUser = getCurrentUser();
@@ -49,18 +56,31 @@ async function loadUserProfile() {
 // Function to check if user is logged in (imported from login.js)
 async function checkLoginStatus() {
     const token = localStorage.getItem('authToken');
-    if (!token) return false;
+    console.log('Checking login status...');
+    console.log('Token exists:', !!token);
+    
+    if (!token) {
+        console.log('No token found, redirecting to login');
+        return false;
+    }
 
     try {
+        console.log('Verifying token with:', `${API_BASE_URL}/auth/verify`);
         const response = await fetch(`${API_BASE_URL}/auth/verify`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
         
+        console.log('Token verification response status:', response.status);
+        
         if (response.ok) {
+            const data = await response.json();
+            console.log('Token verification successful:', data);
             return true;
         } else {
+            const errorData = await response.json();
+            console.log('Token verification failed:', errorData);
             // Token is invalid, clear storage
             localStorage.removeItem('authToken');
             localStorage.removeItem('currentUser');

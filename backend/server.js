@@ -22,9 +22,15 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS configuration - allow GitHub Pages and localhost
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    'https://prosetii.github.io',
+    'https://prosetii.github.io/SCHSFBLA.github.io',
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000'
+  ],
   credentials: true
 }));
 
@@ -41,18 +47,25 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'SCHS FBLA Backend is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    deployed: true
   });
 });
 
-// Serve static files (for production)
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../SCHSFBLA.github.io')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../SCHSFBLA.github.io/index.html'));
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'SCHS FBLA Backend API',
+    version: '1.0.0',
+    deployed: true,
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      users: '/api/users'
+    }
   });
-}
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -68,7 +81,15 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 SCHS FBLA Backend running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-}); 
+// For Vercel, we need to export the app
+if (process.env.NODE_ENV === 'production') {
+  // Vercel serverless function
+  module.exports = app;
+} else {
+  // Local development
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 SCHS FBLA Backend running on port ${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+} 

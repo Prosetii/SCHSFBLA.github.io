@@ -78,15 +78,13 @@ The database is initialized with these users:
 
 ## Deployment
 
-### Railway (Recommended)
-1. Connect your GitHub repository to Railway
-2. Set environment variables in Railway dashboard
-3. Deploy automatically on push
-
-### Heroku
-1. Create Heroku app
-2. Set environment variables
-3. Deploy with `git push heroku main`
+### Vercel (Recommended)
+1. Install Vercel CLI: `npm i -g vercel`
+2. Login to Vercel: `vercel login`
+3. Deploy: `vercel --prod`
+4. Set environment variables in Vercel dashboard:
+   - `JWT_SECRET=your-super-secret-key-here`
+   - `NODE_ENV=production`
 
 ### Local Development
 - Backend runs on `http://localhost:3001`

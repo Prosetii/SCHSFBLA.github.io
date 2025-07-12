@@ -11,6 +11,8 @@ const userRoutes = require('./routes/users');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
+
 // Security middleware
 app.use(helmet());
 

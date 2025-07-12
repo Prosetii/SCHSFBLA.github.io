@@ -471,7 +471,7 @@ footer p {
 
 #userGreeting {
   font-size: 1.2rem;
-  color: var(--text-light);
+  color: white;
   margin-top: 0.5rem;
 }
 

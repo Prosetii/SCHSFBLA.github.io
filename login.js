@@ -1,5 +1,5 @@
 // Backend API connection for SCHS FBLA
-const API_BASE_URL = 'https://myproject-1vypt4c7v-seth-durazos-projects.vercel.app/api';
+const API_BASE_URL = 'https://our-project-hssymxraviptvbeeww2qx7bazclxv.vercel.app/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');

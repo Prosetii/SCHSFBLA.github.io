@@ -577,19 +577,19 @@ footer p {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 8px;
-  height: 8px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 12px;
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   cursor: pointer;
   z-index: 1000;
   transition: all 0.3s ease;
-  opacity: 0.3;
+  opacity: 0.5;
 }
 
 #easterEgg:hover {
-  opacity: 0.6;
+  opacity: 0.8;
   transform: scale(1.5);
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.3);
 }

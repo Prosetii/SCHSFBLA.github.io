@@ -1,5 +1,5 @@
 // Shared navigation functionality
-const API_BASE_URL = 'https://schs-fbla-backend.vercel.app/api';
+const API_BASE_URL = 'https://our-project.vercel.app/api';
 
 // Function to check if user is logged in
 async function checkLoginStatus() {

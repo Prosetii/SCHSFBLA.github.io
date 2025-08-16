@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Redirect to dashboard after a short delay
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    // Force a hard redirect to ensure navigation updates
+                    window.location.replace('dashboard.html');
                 }, 1500);
             } else {
                 // Show error message from backend

@@ -1,5 +1,5 @@
 // Shared navigation functionality
-const API_BASE_URL = 'https://our-project.vercel.app/api';
+const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
 
 // Function to check if user is logged in
 async function checkLoginStatus() {
@@ -63,11 +63,16 @@ async function logout() {
 
 // Function to update navigation based on login status
 async function updateNavigation() {
+    console.log('updateNavigation called');
     const navLinks = document.querySelector('.nav-links');
-    if (!navLinks) return;
+    if (!navLinks) {
+        console.log('No nav-links found');
+        return;
+    }
 
     const isLoggedIn = await checkLoginStatus();
     const currentUser = getCurrentUser();
+    console.log('Navigation - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser);
 
     // Clear existing navigation
     navLinks.innerHTML = '';
@@ -135,4 +140,7 @@ async function updateNavigation() {
 }
 
 // Initialize navigation when page loads
-document.addEventListener('DOMContentLoaded', updateNavigation); 
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Navigation script loaded, updating navigation...');
+    updateNavigation();
+}); 

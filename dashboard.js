@@ -1,5 +1,5 @@
 // Dashboard functionality for SCHS FBLA with backend integration
-const API_BASE_URL = 'https://our-project.vercel.app/api';
+const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Dashboard loaded, checking authentication...');

@@ -11,7 +11,7 @@ const userRoutes = require('./routes/users');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
+// API base URL for reference (not used in server code)
 
 // Security middleware
 app.use(helmet());
@@ -29,12 +29,19 @@ app.use(cors({
   origin: [
     'https://prosetii.github.io',
     'https://prosetii.github.io/SCHSFBLA.github.io',
+    'https://schs-fbla-backend.vercel.app',
     'http://localhost:3000',
     'http://localhost:8000',
-    'http://127.0.0.1:8000'
+    'http://127.0.0.1:8000',
+    'http://localhost:3001'
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Body parsing middleware
 app.use(express.json());

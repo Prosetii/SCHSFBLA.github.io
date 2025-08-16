@@ -19,9 +19,26 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Display user greeting
     const currentUser = getCurrentUser();
+    console.log('Current user data:', currentUser);
+    
     const userGreeting = document.getElementById('userGreeting');
-    if (userGreeting && currentUser) {
-        userGreeting.textContent = `Hello, ${currentUser.username}! (${currentUser.role})`;
+    if (userGreeting) {
+        if (currentUser && currentUser.username) {
+            userGreeting.textContent = `Hello, ${currentUser.username}! (${currentUser.role || 'User'})`;
+        } else {
+            // Fallback: try to get user from localStorage directly
+            const userStr = localStorage.getItem('currentUser');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    userGreeting.textContent = `Hello, ${user.username || 'User'}! (${user.role || 'User'})`;
+                } catch (e) {
+                    userGreeting.textContent = 'Hello, User!';
+                }
+            } else {
+                userGreeting.textContent = 'Hello, User!';
+            }
+        }
     }
 
     // Load user profile data

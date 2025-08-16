@@ -1,10 +1,10 @@
 // Dashboard functionality for SCHS FBLA with backend integration
-const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
+const API_BASE_URL = 'https://schs-fbla-backend.vercel.app/api';
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Dashboard loaded, checking authentication...');
     
-    // Check if user is logged in
+    // Check if user is logged in (function from navigation.js)
     const isLoggedIn = await checkLoginStatus();
     console.log('Login status result:', isLoggedIn);
     
@@ -53,80 +53,7 @@ async function loadUserProfile() {
     }
 }
 
-// Function to check if user is logged in (imported from login.js)
-async function checkLoginStatus() {
-    const token = localStorage.getItem('authToken');
-    console.log('Checking login status...');
-    console.log('Token exists:', !!token);
-    
-    if (!token) {
-        console.log('No token found, redirecting to login');
-        return false;
-    }
-
-    try {
-        console.log('Verifying token with:', `${API_BASE_URL}/auth/verify`);
-        const response = await fetch(`${API_BASE_URL}/auth/verify`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        console.log('Token verification response status:', response.status);
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Token verification successful:', data);
-            return true;
-        } else {
-            const errorData = await response.json();
-            console.log('Token verification failed:', errorData);
-            // Token is invalid, clear storage
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('isLoggedIn');
-            return false;
-        }
-    } catch (error) {
-        console.error('Token verification error:', error);
-        return false;
-    }
-}
-
-// Function to get current user (imported from login.js)
-function getCurrentUser() {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-// Function to logout (imported from login.js)
-async function logout() {
-    const token = localStorage.getItem('authToken');
-    
-    try {
-        // Call logout endpoint (optional)
-        if (token) {
-            await fetch(`${API_BASE_URL}/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-    } finally {
-        // Clear local storage
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isLoggedIn');
-        
-        // Redirect to login page
-        window.location.href = 'login.html';
-    }
-}
-
-// Function to make authenticated API requests (imported from login.js)
+// Function to make authenticated API requests
 async function apiRequest(endpoint, options = {}) {
     const token = localStorage.getItem('authToken');
     

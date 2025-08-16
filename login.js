@@ -1,5 +1,5 @@
 // Backend API connection for SCHS FBLA
-const API_BASE_URL = 'https://ourproject-indol.vercel.app/api';
+const API_BASE_URL = 'https://schs-fbla-backend.vercel.app/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');

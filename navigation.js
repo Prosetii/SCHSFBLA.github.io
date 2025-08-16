@@ -1,5 +1,5 @@
 // Shared navigation functionality
-const API_BASE_URL = 'https://ourproject-yd1uwfyof-seth-durazos-projects.vercel.app/api';
+const API_BASE_URL = 'https://schs-fbla-backend.vercel.app/api';
 
 // Function to check if user is logged in
 async function checkLoginStatus() {
@@ -66,44 +66,73 @@ async function updateNavigation() {
     const navLinks = document.querySelector('.nav-links');
     if (!navLinks) return;
 
-    // Clear existing navigation completely
+    const isLoggedIn = await checkLoginStatus();
+    const currentUser = getCurrentUser();
+
+    // Clear existing navigation
     navLinks.innerHTML = '';
 
-    const isLoggedIn = await checkLoginStatus();
+    // Add common navigation links
+    const commonLinks = [
+        { href: 'index.html', text: 'Home' },
+        { href: 'about.html', text: 'About Us' },
+        { href: 'mission.html', text: 'Our Mission' }
+    ];
 
-    // Create navigation HTML based on login status
-    let navigationHTML = '';
-    
-    // Common links
-    navigationHTML += '<li><a href="index.html">Home</a></li>';
-    navigationHTML += '<li><a href="about.html">About Us</a></li>';
-    navigationHTML += '<li><a href="mission.html">Our Mission</a></li>';
-    
+    // Add common links
+    commonLinks.forEach(link => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = link.href;
+        a.textContent = link.text;
+        
+        // Mark current page as active
+        if (window.location.pathname.includes(link.href)) {
+            a.classList.add('active');
+        }
+        
+        li.appendChild(a);
+        navLinks.appendChild(li);
+    });
+
+    // Add login/logout based on status
     if (isLoggedIn) {
-        // User is logged in - show dashboard and logout
-        navigationHTML += '<li><a href="dashboard.html">Dashboard</a></li>';
-        navigationHTML += '<li><a href="#" class="logout-link" onclick="logout(); return false;">Logout</a></li>';
+        // User is logged in - show dashboard
+        const dashboardLi = document.createElement('li');
+        const dashboardLink = document.createElement('a');
+        dashboardLink.href = 'dashboard.html';
+        dashboardLink.textContent = 'Dashboard';
+        if (window.location.pathname.includes('dashboard.html')) {
+            dashboardLink.classList.add('active');
+        }
+        dashboardLi.appendChild(dashboardLink);
+        navLinks.appendChild(dashboardLi);
+
+        // Add logout link
+        const logoutLi = document.createElement('li');
+        const logoutLink = document.createElement('a');
+        logoutLink.href = '#';
+        logoutLink.textContent = 'Logout';
+        logoutLink.classList.add('logout-link');
+        logoutLink.onclick = (e) => {
+            e.preventDefault();
+            logout();
+        };
+        logoutLi.appendChild(logoutLink);
+        navLinks.appendChild(logoutLi);
     } else {
         // User is not logged in - show login
-        navigationHTML += '<li><a href="login.html">Login</a></li>';
-    }
-    
-    // Set the navigation HTML
-    navLinks.innerHTML = navigationHTML;
-    
-    // Mark current page as active
-    const currentPath = window.location.pathname;
-    const links = navLinks.querySelectorAll('a');
-    links.forEach(link => {
-        if (currentPath.includes(link.getAttribute('href'))) {
-            link.classList.add('active');
+        const loginLi = document.createElement('li');
+        const loginLink = document.createElement('a');
+        loginLink.href = 'login.html';
+        loginLink.textContent = 'Login';
+        if (window.location.pathname.includes('login.html')) {
+            loginLink.classList.add('active');
         }
-    });
+        loginLi.appendChild(loginLink);
+        navLinks.appendChild(loginLi);
+    }
 }
 
 // Initialize navigation when page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateNavigation);
-} else {
-    updateNavigation();
-} 
+document.addEventListener('DOMContentLoaded', updateNavigation); 

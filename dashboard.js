@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Function to get first name from username
     function getFirstName(username) {
         if (!username) return 'User';
-        // Split by common separators and take the first part
-        const firstName = username.split(/[-_\s]/)[0];
+        // Split by dots and take the first part
+        const firstName = username.split('.')[0];
         // Capitalize first letter
         return firstName.charAt(0).toUpperCase() + firstName.slice(1);
     }

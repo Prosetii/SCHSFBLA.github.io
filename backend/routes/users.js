@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
@@ -114,7 +115,6 @@ router.put('/change-password', authenticateToken, async (req, res) => {
         }
 
         // Verify current password
-        const bcrypt = require('bcryptjs');
         const isValidPassword = await bcrypt.compare(currentPassword, user.password_hash);
         
         if (!isValidPassword) {
@@ -149,6 +149,8 @@ router.put('/change-password', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { username, email, password, role = 'student' } = req.body;
+    
+    console.log('Creating user with data:', { username, email, role });
 
     // Validate input
     if (!username || !password) {
@@ -165,39 +167,45 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
       [username],
       async (err, existingUser) => {
         if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ error: 'Database error' });
+          console.error('Database error checking existing user:', err);
+          return res.status(500).json({ error: 'Database error checking existing user' });
         }
 
         if (existingUser) {
           return res.status(409).json({ error: 'Username already exists' });
         }
 
-        // Hash password
-        const bcrypt = require('bcryptjs');
-        const passwordHash = await bcrypt.hash(password, 12);
+        try {
+          // Hash password
+          const passwordHash = await bcrypt.hash(password, 12);
+          console.log('Password hashed successfully');
 
-        // Insert new user
-        db.run(
-          'INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, ?)',
-          [username, passwordHash, email, role],
-          function(err) {
-            if (err) {
-              console.error('Database error:', err);
-              return res.status(500).json({ error: 'Database error' });
+          // Insert new user
+          db.run(
+            'INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, ?)',
+            [username, passwordHash, email, role],
+            function(err) {
+              if (err) {
+                console.error('Database error inserting user:', err);
+                return res.status(500).json({ error: 'Database error inserting user: ' + err.message });
+              }
+
+              console.log('User created successfully with ID:', this.lastID);
+              res.status(201).json({
+                message: 'User created successfully',
+                userId: this.lastID
+              });
             }
-
-            res.status(201).json({
-              message: 'User created successfully',
-              userId: this.lastID
-            });
-          }
-        );
+          );
+        } catch (hashError) {
+          console.error('Password hashing error:', hashError);
+          return res.status(500).json({ error: 'Password hashing error' });
+        }
       }
     );
   } catch (error) {
     console.error('User creation error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 });
 

@@ -1,6 +1,7 @@
 // Dashboard functionality for SCHS FBLA with backend integration
 
 document.addEventListener('DOMContentLoaded', async function() {
+    console.log('=== DASHBOARD.JS LOADED ===');
     console.log('Dashboard loaded, checking authentication...');
     
     // Check if user is logged in (function from navigation.js)

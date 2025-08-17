@@ -1,14 +1,9 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
 const bcrypt = require('bcryptjs');
+const supabase = require('../config/supabase');
 
 const router = express.Router();
-
-// Database connection
-const dbPath = path.join(__dirname, '../database.sqlite');
-const db = new sqlite3.Database(dbPath);
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'schs-fbla-secret-key-change-in-production';
@@ -162,47 +157,51 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
     }
 
     // Check if user already exists
-    db.get(
-      'SELECT id FROM users WHERE username = ?',
-      [username],
-      async (err, existingUser) => {
-        if (err) {
-          console.error('Database error checking existing user:', err);
-          return res.status(500).json({ error: 'Database error checking existing user' });
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', username)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Database error checking existing user:', checkError);
+      return res.status(500).json({ error: 'Database error checking existing user' });
+    }
+
+    if (existingUser) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 12);
+    console.log('Password hashed successfully');
+
+    // Insert new user
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert([
+        {
+          username,
+          password_hash: passwordHash,
+          email,
+          role,
+          is_active: true
         }
+      ])
+      .select()
+      .single();
 
-        if (existingUser) {
-          return res.status(409).json({ error: 'Username already exists' });
-        }
+    if (insertError) {
+      console.error('Database error inserting user:', insertError);
+      return res.status(500).json({ error: 'Database error inserting user: ' + insertError.message });
+    }
 
-        try {
-          // Hash password
-          const passwordHash = await bcrypt.hash(password, 12);
-          console.log('Password hashed successfully');
+    console.log('User created successfully with ID:', newUser.id);
+    res.status(201).json({
+      message: 'User created successfully',
+      userId: newUser.id
+    });
 
-          // Insert new user
-          db.run(
-            'INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, ?)',
-            [username, passwordHash, email, role],
-            function(err) {
-              if (err) {
-                console.error('Database error inserting user:', err);
-                return res.status(500).json({ error: 'Database error inserting user: ' + err.message });
-              }
-
-              console.log('User created successfully with ID:', this.lastID);
-              res.status(201).json({
-                message: 'User created successfully',
-                userId: this.lastID
-              });
-            }
-          );
-        } catch (hashError) {
-          console.error('Password hashing error:', hashError);
-          return res.status(500).json({ error: 'Password hashing error' });
-        }
-      }
-    );
   } catch (error) {
     console.error('User creation error:', error);
     res.status(500).json({ error: 'Internal server error: ' + error.message });
@@ -210,18 +209,23 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // Get all users (admin only)
-router.get('/', authenticateToken, requireAdmin, (req, res) => {
-  db.all(
-    'SELECT id, username, email, role, created_at, last_login, is_active FROM users ORDER BY created_at DESC',
-    (err, users) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database error' });
-      }
+router.get('/', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, username, email, role, created_at, last_login, is_active')
+      .order('created_at', { ascending: false });
 
-      res.json({ users });
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ error: 'Database error' });
     }
-  );
+
+    res.json({ users: users || [] });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Get user by ID (admin only)

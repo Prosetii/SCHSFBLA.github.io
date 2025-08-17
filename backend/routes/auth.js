@@ -1,14 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const supabase = require('../config/supabase');
 
 const router = express.Router();
-
-// Database connection
-const dbPath = path.join(__dirname, '../database.sqlite');
-const db = new sqlite3.Database(dbPath);
 
 // JWT Secret (in production, use environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || 'schs-fbla-secret-key-change-in-production';
@@ -35,55 +30,56 @@ router.post('/login', loginLimiter, async (req, res) => {
     }
 
     // Find user in database
-    db.get(
-      'SELECT * FROM users WHERE username = ? AND is_active = 1',
-      [username],
-      async (err, user) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ error: 'Database error' });
-        }
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .eq('is_active', true)
+      .single();
 
-        if (!user) {
-          return res.status(401).json({ error: 'Invalid credentials' });
-        }
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ error: 'Database error' });
+    }
 
-        // Check password
-        const isValidPassword = await bcrypt.compare(password, user.password_hash);
-        if (!isValidPassword) {
-          return res.status(401).json({ error: 'Invalid credentials' });
-        }
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
-        // Update last login
-        db.run(
-          'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
-          [user.id]
-        );
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
-        // Generate JWT token
-        const token = jwt.sign(
-          { 
-            userId: user.id, 
-            username: user.username, 
-            role: user.role 
-          },
-          JWT_SECRET,
-          { expiresIn: '24h' }
-        );
+    // Update last login
+    await supabase
+      .from('users')
+      .update({ last_login: new Date().toISOString() })
+      .eq('id', user.id);
 
-        // Return success response
-        res.json({
-          message: 'Login successful',
-          token,
-          user: {
-            id: user.id,
-            username: user.username,
-            role: user.role,
-            email: user.email
-          }
-        });
-      }
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        username: user.username, 
+        role: user.role 
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
     );
+
+    // Return success response
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        email: user.email
+      }
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -59,6 +59,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (adminSection && currentUser && currentUser.role === 'admin') {
         adminSection.style.display = 'block';
         console.log('✅ Admin section shown for user:', currentUser.username);
+        console.log('Admin section display style:', adminSection.style.display);
+        console.log('Admin section is visible:', adminSection.offsetParent !== null);
     } else {
         console.log('❌ Admin section NOT shown because:');
         console.log('- Admin section element exists:', !!adminSection);
@@ -68,17 +70,25 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Add click handlers for admin buttons
     const addUserBtn = document.getElementById('addUserBtn');
+    console.log('Add User button found:', addUserBtn);
     if (addUserBtn) {
         addUserBtn.addEventListener('click', function() {
+            console.log('Add User button clicked!');
             showAddUserModal();
         });
+    } else {
+        console.log('❌ Add User button NOT found!');
     }
 
     const viewUsersBtn = document.getElementById('viewUsersBtn');
+    console.log('View Users button found:', viewUsersBtn);
     if (viewUsersBtn) {
         viewUsersBtn.addEventListener('click', function() {
+            console.log('View Users button clicked!');
             showUsersList();
         });
+    } else {
+        console.log('❌ View Users button NOT found!');
     }
 
     // Load user profile data

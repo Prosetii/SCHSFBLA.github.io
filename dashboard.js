@@ -20,22 +20,30 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Display user greeting
     const currentUser = getCurrentUser();
     console.log('Current user data:', currentUser);
+    console.log('localStorage currentUser:', localStorage.getItem('currentUser'));
+    console.log('localStorage authToken:', localStorage.getItem('authToken'));
     
     const userGreeting = document.getElementById('userGreeting');
     if (userGreeting) {
         if (currentUser && currentUser.username) {
+            console.log('Setting greeting with username:', currentUser.username);
             userGreeting.textContent = `Hello, ${currentUser.username}! (${currentUser.role || 'User'})`;
         } else {
+            console.log('No currentUser or username, trying fallback...');
             // Fallback: try to get user from localStorage directly
             const userStr = localStorage.getItem('currentUser');
+            console.log('Direct localStorage userStr:', userStr);
             if (userStr) {
                 try {
                     const user = JSON.parse(userStr);
+                    console.log('Parsed user from localStorage:', user);
                     userGreeting.textContent = `Hello, ${user.username || 'User'}! (${user.role || 'User'})`;
                 } catch (e) {
+                    console.error('Error parsing user from localStorage:', e);
                     userGreeting.textContent = 'Hello, User!';
                 }
             } else {
+                console.log('No user data in localStorage');
                 userGreeting.textContent = 'Hello, User!';
             }
         }

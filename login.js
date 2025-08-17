@@ -32,11 +32,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 // Store JWT token and user data
                 console.log('Login response data:', data);
+                console.log('User object from response:', data.user);
+                console.log('Token from response:', data.token);
+                
                 localStorage.setItem('authToken', data.token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
                 localStorage.setItem('isLoggedIn', 'true');
                 
                 console.log('Stored user data:', localStorage.getItem('currentUser'));
+                console.log('Stored auth token:', localStorage.getItem('authToken'));
                 
                 // Show success message
                 showMessage('Login successful! Redirecting...', 'success');

@@ -145,6 +145,62 @@ router.put('/change-password', authenticateToken, async (req, res) => {
   }
 });
 
+// Create new user (admin only)
+router.post('/', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { username, email, password, role = 'student' } = req.body;
+
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
+    // Check if user already exists
+    db.get(
+      'SELECT id FROM users WHERE username = ?',
+      [username],
+      async (err, existingUser) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        if (existingUser) {
+          return res.status(409).json({ error: 'Username already exists' });
+        }
+
+        // Hash password
+        const bcrypt = require('bcryptjs');
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        // Insert new user
+        db.run(
+          'INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, ?)',
+          [username, passwordHash, email, role],
+          function(err) {
+            if (err) {
+              console.error('Database error:', err);
+              return res.status(500).json({ error: 'Database error' });
+            }
+
+            res.status(201).json({
+              message: 'User created successfully',
+              userId: this.lastID
+            });
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error('User creation error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get all users (admin only)
 router.get('/', authenticateToken, requireAdmin, (req, res) => {
   db.all(

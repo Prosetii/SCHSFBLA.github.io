@@ -51,9 +51,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Show admin section if user is admin
     const adminSection = document.getElementById('adminSection');
+    console.log('Checking admin section...');
+    console.log('Admin section element:', adminSection);
+    console.log('Current user:', currentUser);
+    console.log('User role:', currentUser?.role);
+    
     if (adminSection && currentUser && currentUser.role === 'admin') {
         adminSection.style.display = 'block';
-        console.log('Admin section shown for user:', currentUser.username);
+        console.log('✅ Admin section shown for user:', currentUser.username);
+    } else {
+        console.log('❌ Admin section NOT shown because:');
+        console.log('- Admin section element exists:', !!adminSection);
+        console.log('- Current user exists:', !!currentUser);
+        console.log('- User role is admin:', currentUser?.role === 'admin');
     }
 
     // Add click handlers for admin buttons

@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     console.log('User is logged in, loading dashboard...');
 
+    // Function to get first name from username
+    function getFirstName(username) {
+        if (!username) return 'User';
+        // Split by common separators and take the first part
+        const firstName = username.split(/[-_\s]/)[0];
+        // Capitalize first letter
+        return firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    }
+
     // Display user greeting
     const currentUser = getCurrentUser();
     console.log('Current user data:', currentUser);
@@ -27,7 +36,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (userGreeting) {
         if (currentUser && currentUser.username) {
             console.log('Setting greeting with username:', currentUser.username);
-            userGreeting.textContent = `Hello, ${currentUser.username}! (${currentUser.role || 'User'})`;
+            const firstName = getFirstName(currentUser.username);
+            userGreeting.textContent = `Hello, ${firstName}!`;
         } else {
             console.log('No currentUser or username, trying fallback...');
             // Fallback: try to get user from localStorage directly
@@ -37,7 +47,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 try {
                     const user = JSON.parse(userStr);
                     console.log('Parsed user from localStorage:', user);
-                    userGreeting.textContent = `Hello, ${user.username || 'User'}! (${user.role || 'User'})`;
+                    const firstName = getFirstName(user.username);
+                    userGreeting.textContent = `Hello, ${firstName}!`;
                 } catch (e) {
                     console.error('Error parsing user from localStorage:', e);
                     userGreeting.textContent = 'Hello, User!';
